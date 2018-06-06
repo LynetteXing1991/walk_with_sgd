@@ -39,6 +39,8 @@ parser.add_argument('--epoch_index', type=str, default='1',
                     help='resume experiment ')
 parser.add_argument('--num_batches', type=int, default=450,
                     help='number of batches per epoch')
+parser.add_argument('--mode', type=str, default='sgd',
+                    help='mode name (sgd, gd)')
 
 
 
@@ -158,6 +160,27 @@ def iteratively_interpolate_model(dir,save_dir):
         with open(save_dir + "/train_acc.pkl", "wb") as f:
             pkl.dump(train_acc_list, f)
 
+def iteratively_interpolate_model_gd(dir,save_dir):
+    torch.nn.Module.dump_patches = True
+    with open(dir + "epoch_1", 'rb') as f:
+    #with open(dir + 'init_model.pt', 'rb') as f:
+        checkpoint = torch.load(f)
+        model_initial = checkpoint['net']
+    model1=model_initial
+    train_loss_list, train_acc_list, val_loss_list, val_acc_list, dist_iteration_list=[],[],[],[],[]
+    e=0
+    for j in range(2,args.num_batches):
+        with open(dir + "epoch_"  + str(j) + '.pt', 'rb') as f:
+            checkpoint = torch.load(f)
+        model2 = checkpoint['net']
+        e = interpolate_between_2models(model1,model2,train_loss_list,train_acc_list, e)
+        model1 = model2
+        print("Iteration Number: "+str(len(train_loss_list)))
+        with open(save_dir + "/train_loss.pkl", "wb") as f:
+            pkl.dump(train_loss_list, f)
+
+        with open(save_dir + "/train_acc.pkl", "wb") as f:
+            pkl.dump(train_acc_list, f)
 
 def interpolate_between_2models(model1,model2,train_loss_list,train_acc_list,epoch):
     if args.arch == 'resnet':
@@ -186,8 +209,12 @@ def interpolate_between_2models(model1,model2,train_loss_list,train_acc_list,epo
         train_acc_list.append(train_acc)
         epoch+=1
     return epoch
-if not os.path.exists(args.save_dir):
-    os.makedirs(args.save_dir)
-iteratively_interpolate_model(args.model_dir, args.save_dir)
+save_dir=args.model_dir+'/interpolation_'+str(args.epoch_index)+'/'
+if not os.path.exists(save_dir):
+    os.makedirs(save_dir)
+if args.mode=='sgd':
+    iteratively_interpolate_model(args.model_dir, args.save_dir)
+else:
+    iteratively_interpolate_model_gd(args.model_dir, args.save_dir)
 
 

@@ -37,7 +37,7 @@ parser.add_argument('--bn', type=bool, default=True,
                     help='batch norm T/F')
 # Meta arguments: Tracking, resumability, CUDA
 parser.add_argument('--dataset', type=str, default='cifar10',
-                    help='dataset name (cifar10, mnist, imagnet)')
+                    help='dataset name (cifar10, mnist)')
 parser.add_argument('--datasize', type=int, default=45000,
                     help='dataset size')
 parser.add_argument('--arch', type=str, default='resnet',
@@ -47,8 +47,6 @@ parser.add_argument('--resume', type=bool, default=False,
 parser.add_argument('--cuda', action='store_false',
                     help='use CUDA')
 parser.add_argument('--cluster', action='store_true', help='do not show the progress bar for batch job')
-parser.add_argument('--noise_var', type=float, default=0.,
-                    help='')
 parser.add_argument('--opt', type=str, default='sgd',
                     help='')
 parser.add_argument('--save_model_per_iter', type=bool, default=True,

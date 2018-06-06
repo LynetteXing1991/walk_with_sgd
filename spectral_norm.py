@@ -14,10 +14,10 @@ import tqdm
 parser = argparse.ArgumentParser(description='Computing spectral norm of Hessian')
 
 # Directories
-parser.add_argument('--data', type=str, default='/u/arpitdev/data/',
+parser.add_argument('--data', type=str, default='default/data/',
                     help='location of the data corpus')
 parser.add_argument('--save_dir', type=str, default='default/',
-                    help='dir path (inside root_dir) to save the log and the final model')
+                    help='dir path of the saved model files')
 
 # Hyperparams
 parser.add_argument('--epoch', type=int, default=1,
@@ -33,8 +33,6 @@ parser.add_argument('--dataset', type=str, default='cifar10',
 parser.add_argument('--datasize', type=int, default=45000,
                     help='dataset size')
 
-parser.add_argument('--arch', type=str, default='vgg11',
-                    help='arch name (resnet, vgg11)')
 parser.add_argument('--cuda', action='store_false',
                     help='use CUDA')
 parser.add_argument('--cluster', action='store_true', help='do not show the progress bar for batch job')
@@ -157,5 +155,5 @@ def hessian_spectral_norm_approx(model, loader, M=args.M, seed=777):
 spec_norm_list = hessian_spectral_norm_approx(model, trainloader_hessian)
 with open(args.save_dir + '/model_for_hessian_epoch_' + str(args.epoch) + '.pkl', "wb") as f:
         pkl.dump(spec_norm_list[-1], f)
-print('Spectral norm computed for ', str(args.epoch), ' saved at: ', args.save_dir + '/model_for_hessian_epoch' + str(args.epoch) + '.pkl')
+print('Spectral norm computed for ', str(args.epoch), ' saved at: ', args.save_dir + '/model_for_hessian_epoch_' + str(args.epoch) + '.pkl')
 print('Estimated spectral norm: ', spec_norm_list[-1])
